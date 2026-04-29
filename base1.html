@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Paraíso del Mar - Registro</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 15px; }
+        .header { background: #1a237e; color: white; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 20px; }
+        .header h1 { font-size: 24px; margin-bottom: 5px; }
+        .header p { font-size: 12px; color: #b3e5fc; }
+        .info-bar { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; }
+        .info-item { text-align: center; }
+        .label-info { font-size: 11px; color: #666; font-weight: 600; }
+        .texto-info { font-size: 13px; color: #333; font-weight: bold; }
+        .hora-grande { font-size: 20px; color: #1a237e; font-weight: bold; }
+        .contador { background: #4caf50; padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; color: white; }
+        .contador-label { font-size: 12px; font-weight: 600; }
+        .contador-numero { font-size: 48px; font-weight: bold; }
+        .seccion { margin-bottom: 20px; }
+        .label-seccion { font-size: 14px; font-weight: 700; color: #1a237e; margin-bottom: 10px; }
+        .botones-row { display: flex; gap: 6px; }
+        .boton-acceso { flex: 1; background: #e0e0e0; padding: 12px; border-radius: 8px; text-align: center; border: none; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .boton-acceso.activo { background: #1a237e; color: white; }
+        .botones-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .boton-tipo { background: #e0e0e0; padding: 12px; border-radius: 8px; text-align: center; border: none; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .boton-tipo.activo { background: #1a237e; color: white; }
+        .input-cantidad { width: 100%; background: white; font-size: 24px; font-weight: bold; text-align: center; padding: 15px; border-radius: 8px; border: 2px solid #1a237e; color: #1a237e; }
+        .boton-guardar { width: 100%; background: #4caf50; color: white; padding: 18px; border-radius: 10px; font-size: 16px; font-weight: bold; border: none; cursor: pointer; margin-top: 10px; }
+        .boton-guardar:disabled { opacity: 0.6; }
+        .mensaje { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #4caf50; color: white; padding: 15px 30px; border-radius: 8px; font-weight: bold; display: none; z-index: 1000; }
+        .mensaje.error { background: #f44336; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌴 PARAÍSO DEL MAR</h1>
+        <p>REGISTRO INGRESOS</p>
+    </div>
+
+    <div class="info-bar">
+        <div class="info-item">
+            <div class="label-info">📱 Tablet:</div>
+            <div class="texto-info" id="tablet">Tablet Base 1</div>
+        </div>
+        <div class="info-item">
+            <div class="label-info">⏰ Hora:</div>
+            <div class="hora-grande" id="hora">00:00</div>
+        </div>
+    </div>
+
+    <div class="contador">
+        <div class="contador-label">REGISTROS HOY</div>
+        <div class="contador-numero" id="total">0</div>
+    </div>
+
+    <div class="seccion">
+        <div class="label-seccion">📍 ACCESO:</div>
+        <div class="botones-row" id="accesos"></div>
+    </div>
+
+    <div class="seccion">
+        <div class="label-seccion">👤 TIPO:</div>
+        <div class="botones-grid" id="tipos"></div>
+    </div>
+
+    <div class="seccion">
+        <div class="label-seccion">📊 CANTIDAD:</div>
+        <input type="number" class="input-cantidad" id="cantidad" value="1" min="1" max="999">
+    </div>
+
+    <button class="boton-guardar" id="btnGuardar">✓ GUARDAR</button>
+
+    <div class="mensaje" id="mensaje"></div>
+
+    <script>
+        const API_URL = 'https://paraiso-del-mar-backend.onrender.com';
+        const ACCESOS = ['Muelle Principal', 'Base 4', 'Base 1'];
+        const TIPOS = ['Dueño', 'Rentista', 'Golfista', 'Restaurante', 'Proveedor', 'Empleado', 'Administrativo'];
+
+        let accesoSeleccionado = 'Base 1';
+        let tipoSeleccionado = 'Dueño';
+
+        // Crear botones de acceso
+        const divAccesos = document.getElementById('accesos');
+        ACCESOS.forEach(acc => {
+            const btn = document.createElement('button');
+            btn.className = 'boton-acceso' + (acc === accesoSeleccionado ? ' activo' : '');
+            btn.textContent = acc;
+            btn.onclick = () => {
+                accesoSeleccionado = acc;
+                document.querySelectorAll('.boton-acceso').forEach(b => b.classList.remove('activo'));
+                btn.classList.add('activo');
+            };
+            divAccesos.appendChild(btn);
+        });
+
+        // Crear botones de tipo
+        const divTipos = document.getElementById('tipos');
+        TIPOS.forEach(tipo => {
+            const btn = document.createElement('button');
+            btn.className = 'boton-tipo' + (tipo === tipoSeleccionado ? ' activo' : '');
+            btn.textContent = tipo;
+            btn.onclick = () => {
+                tipoSeleccionado = tipo;
+                document.querySelectorAll('.boton-tipo').forEach(b => b.classList.remove('activo'));
+                btn.classList.add('activo');
+            };
+            divTipos.appendChild(btn);
+        });
+
+        // Actualizar hora
+        function actualizarHora() {
+            const ahora = new Date();
+            const hora = String(ahora.getHours()).padStart(2, '0');
+            const min = String(ahora.getMinutes()).padStart(2, '0');
+            document.getElementById('hora').textContent = `${hora}:${min}`;
+        }
+        actualizarHora();
+        setInterval(actualizarHora, 1000);
+
+        // Cargar registros del día
+        async function cargarRegistros() {
+            try {
+                const fecha = new Date().toISOString().split('T')[0];
+                const res = await fetch(`${API_URL}/api/estadisticas/${fecha}`);
+                const data = await res.json();
+                document.getElementById('total').textContent = data.total || 0;
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        cargarRegistros();
+
+        // Guardar registro
+        document.getElementById('btnGuardar').onclick = async () => {
+            const cantidad = parseInt(document.getElementById('cantidad').value);
+            if (!cantidad || cantidad === 0) {
+                mostrarMensaje('⚠️ Ingresa cantidad válida', true);
+                return;
+            }
+
+            const btn = document.getElementById('btnGuardar');
+            btn.disabled = true;
+            btn.textContent = 'GUARDANDO...';
+
+            try {
+                const fecha = new Date().toISOString().split('T')[0];
+                const ahora = new Date();
+                const hora = `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}:00`;
+
+                const res = await fetch(`${API_URL}/api/registros`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fecha,
+                        hora,
+                        acceso: accesoSeleccionado,
+                        tipo_persona: tipoSeleccionado,
+                        cantidad,
+                        usuario_captura: document.getElementById('tablet').textContent
+                    })
+                });
+
+                const resultado = await res.json();
+                if (res.ok) {
+                    mostrarMensaje('✓ ' + resultado.mensaje, false);
+                    document.getElementById('cantidad').value = '1';
+                    cargarRegistros();
+                } else {
+                    mostrarMensaje('⚠️ ' + resultado.error, true);
+                }
+            } catch (e) {
+                mostrarMensaje('❌ No se pudo conectar', true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '✓ GUARDAR';
+            }
+        };
+
+        function mostrarMensaje(texto, esError) {
+            const msg = document.getElementById('mensaje');
+            msg.textContent = texto;
+            msg.className = 'mensaje' + (esError ? ' error' : '');
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 3000);
+        }
+    </script>
+</body>
+</html>
