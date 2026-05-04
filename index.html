@@ -33,6 +33,7 @@
         .botones-row { display: flex; gap: 6px; }
         .boton-acceso { flex: 1; background: #e0e0e0; padding: 12px; border-radius: 8px; text-align: center; border: none; font-size: 12px; font-weight: 600; cursor: pointer; }
         .boton-acceso.activo { background: #1a237e; color: white; }
+        .boton-acceso:disabled { opacity: 0.3; cursor: not-allowed; }
         .botones-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .boton-tipo { background: #e0e0e0; padding: 12px; border-radius: 8px; text-align: center; border: none; font-size: 12px; font-weight: 600; cursor: pointer; }
         .boton-tipo.activo { background: #1a237e; color: white; }
@@ -105,7 +106,6 @@
         let accesoSeleccionado = 'Muelle Principal';
         let tipoSeleccionado = 'Dueño';
 
-        // Verificar si ya tiene sesión activa
         if (localStorage.getItem('pinVerificado') === 'true') {
             mostrarApp();
         }
@@ -132,21 +132,28 @@
         });
 
         function inicializarApp() {
-            // Crear botones de acceso
             const divAccesos = document.getElementById('accesos');
             ACCESOS.forEach(acc => {
                 const btn = document.createElement('button');
                 btn.className = 'boton-acceso' + (acc === accesoSeleccionado ? ' activo' : '');
                 btn.textContent = acc;
+                
+                if (acc !== accesoSeleccionado) {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.3';
+                    btn.style.cursor = 'not-allowed';
+                }
+                
                 btn.onclick = () => {
-                    accesoSeleccionado = acc;
-                    document.querySelectorAll('.boton-acceso').forEach(b => b.classList.remove('activo'));
-                    btn.classList.add('activo');
+                    if (!btn.disabled) {
+                        accesoSeleccionado = acc;
+                        document.querySelectorAll('.boton-acceso').forEach(b => b.classList.remove('activo'));
+                        btn.classList.add('activo');
+                    }
                 };
                 divAccesos.appendChild(btn);
             });
 
-            // Crear botones de tipo
             const divTipos = document.getElementById('tipos');
             TIPOS.forEach(tipo => {
                 const btn = document.createElement('button');
@@ -160,7 +167,6 @@
                 divTipos.appendChild(btn);
             });
 
-            // Actualizar hora
             function actualizarHora() {
                 const ahora = new Date();
                 const hora = String(ahora.getHours()).padStart(2, '0');
@@ -170,7 +176,6 @@
             actualizarHora();
             setInterval(actualizarHora, 1000);
 
-            // Cargar registros del día
             async function cargarRegistros() {
                 try {
                     const fecha = new Date().toISOString().split('T')[0];
@@ -183,7 +188,6 @@
             }
             cargarRegistros();
 
-            // Guardar registro
             document.getElementById('btnGuardar').onclick = async () => {
                 const cantidad = parseInt(document.getElementById('cantidad').value);
                 if (!cantidad || cantidad === 0) {
