@@ -20,7 +20,9 @@
             justify-content: center;
             padding: 30px 20px;
         }
-        .sel-titulo { color: #ffffff; font-size: 28px; font-weight: bold; letter-spacing: 1px; text-align: center; }
+        .logo-blanco { display: block; width: 220px; margin: 0 auto; filter: brightness(0) invert(1); }
+        .logo-color  { display: block; width: 160px; margin: 0 auto 10px; mix-blend-mode: multiply; }
+        .logo-header { display: block; width: 130px; margin: 0 auto 6px; filter: brightness(0) invert(1); }
         .sel-subtitulo { color: #71aeb7; font-size: 15px; margin-top: 8px; text-align: center; }
         .sel-divisor { width: 60px; height: 3px; background: #007c89; border-radius: 2px; margin: 20px auto 36px; }
         .sel-botones { display: flex; flex-direction: column; gap: 16px; width: 100%; max-width: 360px; }
@@ -53,7 +55,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;
             max-width: 400px; width: 100%; margin: 20px;
         }
-        .login-box h1 { color: #003660; margin-bottom: 10px; font-size: 24px; }
+        .login-box h1 { margin-bottom: 10px; }
         .login-box p  { color: #666; margin-bottom: 30px; }
         .pin-input {
             width: 100%; font-size: 32px; padding: 15px; text-align: center;
@@ -80,7 +82,7 @@
             background: #003660; color: white; padding: 20px;
             text-align: center; border-radius: 10px; margin-bottom: 20px;
         }
-        .header h1 { font-size: 24px; margin-bottom: 5px; }
+        .header h1 { margin-bottom: 5px; }
         .header p  { font-size: 12px; color: #71aeb7; }
         .info-bar {
             background: white; padding: 15px; border-radius: 8px;
@@ -134,7 +136,7 @@
 
     <!-- ── SELECTOR ─────────────────────────────────────────── -->
     <div id="screenSelector">
-        <h1 class="sel-titulo">🌴 PARAÍSO DEL MAR</h1>
+        <img class="logo-blanco" src="PDM_Logo_Primary_RGB.png" alt="Paraíso del Mar">
         <p class="sel-subtitulo">Registro Diario de Ingresos</p>
         <div class="sel-divisor"></div>
         <div class="sel-botones">
@@ -160,7 +162,7 @@
     <!-- ── LOGIN ────────────────────────────────────────────── -->
     <div id="screenLogin">
         <div class="login-box">
-            <h1>🌴 PARAÍSO DEL MAR</h1>
+            <img class="logo-color" src="PDM_Logo_Primary_RGB.png" alt="Paraíso del Mar">
             <p id="loginSubtitle">Ingresa tu PIN para continuar</p>
             <input type="password" class="pin-input" id="pinInput" maxlength="4" placeholder="••••" inputmode="numeric">
             <div class="pin-error" id="pinError">❌ PIN incorrecto</div>
@@ -172,7 +174,7 @@
     <!-- ── APP ──────────────────────────────────────────────── -->
     <div id="screenApp">
         <div class="header">
-            <h1>🌴 PARAÍSO DEL MAR</h1>
+            <h1><img class="logo-header" src="PDM_Logo_Primary_RGB.png" alt="Paraíso del Mar"></h1>
             <p>REGISTRO DE INGRESOS</p>
         </div>
         <div class="info-bar">
