@@ -1,1 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Paraíso del Mar - Registro</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f2efec; color: #1a2e3a; padding: 15px; }
+        .login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        .login-box { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; max-width: 400px; width: 100%; }
+        .login-box h1 { color: #003660; margin-bottom: 10px; font-size: 24px; }
+        .login-box p { color: #666; margin-bottom: 30px; }
+        .pin-input { width: 100%; font-size: 32px; padding: 15px; text-align: center; border: 2px solid #003660; border-radius: 8px; margin-bottom: 20px; letter-spacing: 10px; }
+        .pin-error { color: #f44336; margin-bottom: 20px; display: none; }
+        .btn-login { width: 100%; background: #003660; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .app-container { display: none; }
+        .header { background: #003660; color: white; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 20px; }
+        .header h1 { font-size: 24px; margin-bottom: 5px; }
+        .header p { font-size: 12px; color: #71aeb7; }
+        .info-bar { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; }
+        .info-item { text-align: center; }
+        .label-info { font-size: 11px; color: #007c89; font-weight: 600; }
+        .texto-info { font-size: 13px; color: #1a2e3a; font-weight: bold; }
+        .hora-grande { font-size: 20px; color: #007c89; font-weight: bold; }
+        .contador { background: #006b35; padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; color: white; }
+        .contador-label { font-size: 12px; font-weight: 600; }
+        .contador-numero { font-size: 48px; font-weight: bold; }
+        .seccion { margin-bottom: 20px; }
+        .label-seccion { font-size: 14px; font-weight: 700; color: #007c89; margin-bottom: 10px; }
+        .botones-row { display: flex; gap: 6px; }
+        .boton-acceso { flex: 1; background: #e0e0e0; padding: 12px; border-radius: 8px; text-align: center; border: none; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .boton-acceso.activo { background: #003660; color: white; }
+        .boton-acceso:disabled { opacity: 0.3; cursor: not-allowed; }
+        .botones-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .boton-tipo { background: #e0e0e0; padding: 12px; border-radius: 8px; text-align: center; border: none; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .boton-tipo.activo { background: #003660; color: white; }
+        .input-cantidad { width: 100%; background: white; font-size: 24px; font-weight: bold; text-align: center; padding: 15px; border-radius: 8px; border: 2px solid #003660; color: #003660; }
+        .boton-guardar { width: 100%; background: #006b35; color: white; padding: 18px; border-radius: 10px; font-size: 16px; font-weight: bold; border: none; cursor: pointer; margin-top: 10px; }
+        .boton-guardar:disabled { opacity: 0.6; }
+        .mensaje { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #006b35; color: white; padding: 15px 30px; border-radius: 8px; font-weight: bold; display: none; z-index: 1000; }
+        .mensaje.error { background: #f44336; }
+        .tablet-error { background: #fff3e0; border: 2px solid #ff9800; border-radius: 10px; padding: 30px; text-align: center; margin-bottom: 20px; }
+        .tablet-error h2 { color: #e65100; margin-bottom: 10px; }
+        .tablet-error p { color: #666; font-size: 13px; }
+        .tablet-error code { background: #f5f5f5; padding: 4px 8px; border-radius: 4px; font-size: 12px; display: block; margin-top: 10px; }
+    </style>
+</head>
+<body>
 
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <h1>🌴 PARAÍSO DEL MAR</h1>
+            <p id="loginSubtitle">Ingresa tu PIN para continuar</p>
+            <input type="password" class="pin-input" id="pinInput" maxlength="4" placeholder="••••" inputmode="numeric">
+            <div class="pin-error" id="pinError">❌ PIN incorrecto</div>
+            <button class="btn-login" onclick="verificarPIN()">INGRESAR</button>
+        </div>
+    </div>
+
+    <div class="app-container" id="appContainer">
+        <div class="header">
+            <h1>🌴 PARAÍSO DEL MAR</h1>
+            <p>REGISTRO DE INGRESOS</p>
+        </div>
+
+        <div class="info-bar">
+            <div class="info-item">
+                <div class="label-info">📱 Tablet:</div>
+                <div class="texto-info" id="tabletNombre">—</div>
+            </div>
+            <div class="info-item">
+                <div class="label-info">⏰ Hora:</div>
+                <div class="hora-grande" id="hora">00:00</div>
+            </div>
+        </div>
+
+        <div class="contador">
+            <div class="contador-label">REGISTROS HOY</div>
+            <div class="contador-numero" id="total">0</div>
+        </div>
+
+        <div class="seccion">
+            <div class="label-seccion">📍 ACCESO:</div>
+            <div class="botones-row" id="accesos"></div>
+        </div>
+
+        <div class="seccion">
+            <div class="label-seccion">👤 TIPO:</div>
+            <div class="botones-grid" id="tipos"></div>
+        </div>
+
+        <div class="seccion">
+            <div class="label-seccion">📊 CANTIDAD:</div>
+            <input type="number" class="input-cantidad" id="cantidad" value="1" min="1" max="999">
+        </div>
+
+        <button class="boton-guardar" id="btnGuardar">✓ GUARDAR</button>
+    </div>
+
+    <div class="mensaje" id="mensaje"></div>
+
+    <script>
+        const API_URL = 'https://paraiso-del-mar-backend.onrender.com';
+
+        const ACCESOS = ['Muelle Principal', 'Base 4', 'Base 1'];
+        const TIPOS   = ['Dueño', 'Rentista', 'Golfista', 'Restaurante', 'Proveedor', 'Empleado', 'Administrativo'];
+
+        // ── Configuración por tablet ──────────────────────────────
+        const TABLETS = {
+            muelle: { nombre: 'Tablet Muelle',  acceso: 'Muelle Principal', pin: '1029' },
+            base4:  { nombre: 'Tablet Base 4',  acceso: 'Base 4',           pin: '3847' },
+            base1:  { nombre: 'Tablet Base 1',  acceso: 'Base 1',           pin: '5665' },
+        };
+
+        // ── Detectar tablet por URL ───────────────────────────────
+        const params      = new URLSearchParams(window.location.search);
+        const tabletKey   = (params.get('tablet') || '').toLowerCase();
+        const tabletConfig = TABLETS[tabletKey];
+
+        // Si no hay parámetro válido, mostrar error amigable
+        if (!tabletConfig) {
+            document.getElementById('loginScreen').innerHTML = `
+                <div class="tablet-error">
+                    <h2>⚠️ Tablet no configurada</h2>
+                    <p>Esta URL no tiene un parámetro de tablet válido.</p>
+                    <p>Usa una de estas URLs:</p>
+                    <code>index.html?tablet=muelle</code>
+                    <code>index.html?tablet=base4</code>
+                    <code>index.html?tablet=base1</code>
+                </div>`;
+        } else {
+            // Mostrar nombre de tablet en el login
+            document.getElementById('loginSubtitle').textContent =
+                `${tabletConfig.nombre} · Ingresa tu PIN`;
+        }
+
+        function verificarPIN() {
+            if (!tabletConfig) return;
+            const pin = document.getElementById('pinInput').value;
+            if (pin === tabletConfig.pin) {
+                mostrarApp();
+            } else {
+                document.getElementById('pinError').style.display = 'block';
+                document.getElementById('pinInput').value = '';
+            }
+        }
+
+        document.getElementById('pinInput')?.addEventListener('keypress', e => {
+            if (e.key === 'Enter') verificarPIN();
+        });
+
+        function mostrarApp() {
+            document.getElementById('loginScreen').style.display  = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            document.getElementById('tabletNombre').textContent   = tabletConfig.nombre;
+            inicializarApp();
+        }
+
+        function inicializarApp() {
+            // ── Accesos ───────────────────────────────────────────
+            const divAccesos = document.getElementById('accesos');
+            ACCESOS.forEach(acc => {
+                const btn = document.createElement('button');
+                const esAsignado = acc === tabletConfig.acceso;
+                btn.className   = 'boton-acceso' + (esAsignado ? ' activo' : '');
+                btn.textContent = acc;
+                btn.disabled    = !esAsignado;
+                divAccesos.appendChild(btn);
+            });
+
+            // ── Tipos ─────────────────────────────────────────────
+            let tipoSeleccionado = TIPOS[0];
+            const divTipos = document.getElementById('tipos');
+            TIPOS.forEach(tipo => {
+                const btn = document.createElement('button');
+                btn.className   = 'boton-tipo' + (tipo === tipoSeleccionado ? ' activo' : '');
+                btn.textContent = tipo;
+                btn.onclick = () => {
+                    tipoSeleccionado = tipo;
+                    document.querySelectorAll('.boton-tipo').forEach(b => b.classList.remove('activo'));
+                    btn.classList.add('activo');
+                };
+                divTipos.appendChild(btn);
+            });
+
+            // ── Reloj ─────────────────────────────────────────────
+            function actualizarHora() {
+                const ahora = new Date();
+                document.getElementById('hora').textContent =
+                    `${String(ahora.getHours()).padStart(2,'0')}:${String(ahora.getMinutes()).padStart(2,'0')}`;
+            }
+            actualizarHora();
+            setInterval(actualizarHora, 1000);
+
+            // ── Total del día ─────────────────────────────────────
+            async function cargarTotal() {
+                try {
+                    const fecha = new Date().toISOString().split('T')[0];
+                    const res   = await fetch(`${API_URL}/api/estadisticas/${fecha}`);
+                    const data  = await res.json();
+                    document.getElementById('total').textContent = data.total || 0;
+                } catch(e) { console.error(e); }
+            }
+            cargarTotal();
+
+            // ── Guardar ───────────────────────────────────────────
+            document.getElementById('btnGuardar').onclick = async () => {
+                const cantidad = parseInt(document.getElementById('cantidad').value);
+                if (!cantidad || cantidad < 1) {
+                    mostrarMensaje('⚠️ Ingresa cantidad válida', true); return;
+                }
+
+                const btn = document.getElementById('btnGuardar');
+                btn.disabled    = true;
+                btn.textContent = 'GUARDANDO...';
+
+                try {
+                    const ahora = new Date();
+                    const fecha = ahora.toISOString().split('T')[0];
+                    const hora  = `${String(ahora.getHours()).padStart(2,'0')}:${String(ahora.getMinutes()).padStart(2,'0')}:00`;
+
+                    const res = await fetch(`${API_URL}/api/registros`, {
+                        method:  'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            fecha,
+                            hora,
+                            acceso:          tabletConfig.acceso,
+                            tipo_persona:    tipoSeleccionado,
+                            cantidad,
+                            usuario_captura: tabletConfig.nombre
+                        })
+                    });
+
+                    const resultado = await res.json();
+                    if (res.ok) {
+                        mostrarMensaje('✓ ' + resultado.mensaje, false);
+                        document.getElementById('cantidad').value = '1';
+                        cargarTotal();
+                    } else {
+                        mostrarMensaje('⚠️ ' + resultado.error, true);
+                    }
+                } catch(e) {
+                    mostrarMensaje('❌ No se pudo conectar', true);
+                } finally {
+                    btn.disabled    = false;
+                    btn.textContent = '✓ GUARDAR';
+                }
+            };
+        }
+
+        function mostrarMensaje(texto, esError) {
+            const msg = document.getElementById('mensaje');
+            msg.textContent = texto;
+            msg.className   = 'mensaje' + (esError ? ' error' : '');
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 3000);
+        }
+    </script>
+</body>
+</html>
