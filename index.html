@@ -244,13 +244,20 @@
             base1:  { nombre: 'Tablet Base 1', acceso: 'Base 1',           pin: '5665' },
         };
 
+        // ⚠️ TEMPORAL: login desactivado para pruebas. Poner en false para reactivar el PIN.
+        const LOGIN_DESACTIVADO = true;
+
         const params       = new URLSearchParams(window.location.search);
         const tabletKey    = (params.get('tablet') || '').toLowerCase();
         const tabletConfig = TABLETS[tabletKey];
 
         // ── Decidir qué pantalla mostrar al cargar ────────────
         if (tabletConfig) {
-            mostrarLogin();
+            if (LOGIN_DESACTIVADO) {
+                mostrarApp();
+            } else {
+                mostrarLogin();
+            }
         }
         // Si no hay ?tablet= válido, #screenSelector ya es visible por defecto
 
