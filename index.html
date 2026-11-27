@@ -239,10 +239,13 @@
         const TIPOS   = ['Dueño', 'Rentista', 'Golfista', 'Restaurante', 'Proveedor', 'Empleado', 'Administrativo'];
 
         const TABLETS = {
-            muelle: { nombre: 'Tablet Muelle', acceso: 'Muelle Principal', pin: '1029' },
-            base4:  { nombre: 'Tablet Base 4', acceso: 'Base 4',           pin: '3847' },
-            base1:  { nombre: 'Tablet Base 1', acceso: 'Base 1',           pin: '5665' },
+            muelle: { nombre: 'Tablet Muelle', acceso: 'Muelle Principal' },
+            base4:  { nombre: 'Tablet Base 4', acceso: 'Base 4' },
+            base1:  { nombre: 'Tablet Base 1', acceso: 'Base 1' },
         };
+
+        // Token de tablet: solo vive en memoria, se pide el PIN al abrir la URL
+        let tabletToken = null;
 
         const params       = new URLSearchParams(window.location.search);
         const tabletKey    = (params.get('tablet') || '').toLowerCase();
@@ -265,13 +268,32 @@
             window.location.href = 'index.html';
         }
 
-        function verificarPIN() {
-            const pin = document.getElementById('pinInput').value;
-            if (pin === tabletConfig.pin) {
-                mostrarApp();
-            } else {
-                document.getElementById('pinError').style.display = 'block';
+        async function verificarPIN() {
+            const pin      = document.getElementById('pinInput').value;
+            const pinError = document.getElementById('pinError');
+            const btn      = document.querySelector('#screenLogin .btn-login');
+            pinError.style.display = 'none';
+            btn.disabled = true;
+            try {
+                const res  = await fetch(`${API_URL}/api/tablets/verify`, {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify({ tablet: tabletKey, pin })
+                });
+                const data = await res.json();
+                if (res.ok && data.ok) {
+                    tabletToken = data.token;
+                    mostrarApp();
+                    return;
+                }
+                pinError.textContent = '❌ ' + (data.error || 'PIN incorrecto');
+                pinError.style.display = 'block';
                 document.getElementById('pinInput').value = '';
+            } catch (e) {
+                pinError.textContent = '❌ No se pudo conectar. Intenta de nuevo.';
+                pinError.style.display = 'block';
+            } finally {
+                btn.disabled = false;
             }
         }
 
@@ -370,7 +392,10 @@
 
                     const res = await fetch(`${API_URL}/api/registros`, {
                         method:  'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type':  'application/json',
+                            'Authorization': `Bearer ${tabletToken}`
+                        },
                         body: JSON.stringify({
                             fecha,
                             hora,
@@ -387,6 +412,9 @@
                         mostrarMensaje('✓ ' + resultado.mensaje, false);
                         document.getElementById('cantidad').value = '1';
                         cargarTotal();
+                    } else if (res.status === 401 || res.status === 403) {
+                        // Sesión de tablet vencida o inválida: volver a pedir el PIN
+                        location.reload();
                     } else {
                         mostrarMensaje('⚠️ ' + resultado.error, true);
                     }

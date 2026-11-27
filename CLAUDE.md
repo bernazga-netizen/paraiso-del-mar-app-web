@@ -12,13 +12,14 @@
 ## Lógica de tablets
 `tablet.html` detecta qué tablet es por el parámetro `?tablet=` en la URL:
 
-| Punto de acceso | URL | PIN |
-|---|---|---|
-| Muelle Principal | `/tablet.html?tablet=muelle` | 1029 |
-| Base 4 | `/tablet.html?tablet=base4` | 3847 |
-| Base 1 | `/tablet.html?tablet=base1` | 5665 |
+| Punto de acceso | URL |
+|---|---|
+| Muelle Principal | `/index.html?tablet=muelle` |
+| Base 4 | `/index.html?tablet=base4` |
+| Base 1 | `/index.html?tablet=base1` |
 
-- El PIN es específico por tablet
+- Los PIN NO viven en el código. Se validan en el backend (`POST /api/tablets/verify`) y se cambian desde el dashboard (`pins-tablets.html`)
+- El backend devuelve un token de tablet que se manda en `Authorization` al registrar; vive solo en memoria
 - Al ingresar PIN correcto, solo muestra el botón del acceso correspondiente
 - El guardia no puede registrar en el acceso equivocado
 - No usar `sessionStorage` para el login — solicitarlo siempre al abrir la URL
